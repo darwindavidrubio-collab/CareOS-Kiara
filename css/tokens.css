@@ -1,0 +1,126 @@
+/* ==========================================================================
+   CareOS — Design Tokens (Tema Rosado & Tema Lluvia)
+   ========================================================================== */
+
+:root {
+  /* Tipografías */
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-sans: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Radios y espaciado */
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* Easing suave del sistema */
+  --ease-out: cubic-bezier(0.22, 0.8, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 220ms;
+  --dur-med: 380ms;
+  --dur-slow: 560ms;
+
+  /* Safe areas móvil */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* --------------------------------------------------------------------------
+   Tema Rosado (Día / Cálido / Cute)
+   -------------------------------------------------------------------------- */
+:root,
+:root[data-theme="rosado"] {
+  --bg-primary: #FFF8F5;
+  --bg-secondary: #FDF1EC;
+  --bg-gradient: radial-gradient(circle at 15% 10%, #FFEAEF 0%, #FFF8F5 48%, #FDF2EC 100%);
+  
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-elevated: rgba(255, 255, 255, 0.95);
+  --surface-subtle: rgba(244, 167, 185, 0.11);
+  --surface-hover: rgba(244, 167, 185, 0.18);
+  --surface-border: rgba(229, 122, 151, 0.18);
+  --surface-border-strong: rgba(229, 122, 151, 0.34);
+
+  --accent: #F4A7B9;
+  --accent-strong: #E57A97;
+  --accent-contrast: #FFFFFF;
+  --accent-soft: rgba(244, 167, 185, 0.24);
+  --accent-glow: rgba(229, 122, 151, 0.28);
+
+  --text-main: #4A3A40;
+  --text-muted: #8C7880;
+  --text-soft: #B09CA4;
+
+  --success: #68A691;
+  --success-bg: rgba(104, 166, 145, 0.14);
+  --warning: #E09866;
+
+  --shadow-card: 0 12px 32px -8px rgba(120, 72, 88, 0.08), 0 2px 6px rgba(120, 72, 88, 0.04);
+  --shadow-float: 0 18px 42px -6px rgba(140, 80, 100, 0.16);
+  --backdrop-blur: blur(14px);
+
+  --terminal-bg: #FFF5F7;
+  --terminal-border: rgba(229, 122, 151, 0.22);
+  --terminal-text: #593E47;
+  --terminal-accent: #D96887;
+  --modal-backdrop: rgba(74, 58, 64, 0.42);
+}
+
+/* --------------------------------------------------------------------------
+   Tema Lluvia (Noche / Relajante / Refugio)
+   -------------------------------------------------------------------------- */
+:root[data-theme="lluvia"] {
+  --bg-primary: #0F1226;
+  --bg-secondary: #2A1F4D;
+  --bg-gradient: linear-gradient(165deg, #0F1226 0%, #191838 52%, #2A1F4D 100%);
+
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-elevated: rgba(28, 26, 56, 0.92);
+  --surface-subtle: rgba(183, 164, 255, 0.09);
+  --surface-hover: rgba(183, 164, 255, 0.16);
+  --surface-border: rgba(255, 255, 255, 0.1);
+  --surface-border-strong: rgba(183, 164, 255, 0.34);
+
+  --accent: #B7A4FF;
+  --accent-strong: #947BFF;
+  --accent-contrast: #121026;
+  --accent-soft: rgba(183, 164, 255, 0.18);
+  --accent-glow: rgba(183, 164, 255, 0.28);
+
+  --text-main: #E8E6F5;
+  --text-muted: #9A97B8;
+  --text-soft: #6E6B8E;
+
+  --success: #7FD1B9;
+  --success-bg: rgba(127, 209, 185, 0.14);
+  --warning: #F2B880;
+
+  --shadow-card: 0 14px 36px -8px rgba(5, 6, 18, 0.45), 0 2px 8px rgba(5, 6, 18, 0.3);
+  --shadow-float: 0 20px 48px -6px rgba(4, 5, 15, 0.65);
+  --backdrop-blur: blur(14px);
+
+  --terminal-bg: rgba(12, 14, 30, 0.78);
+  --terminal-border: rgba(183, 164, 255, 0.22);
+  --terminal-text: #D7D3F0;
+  --terminal-accent: #B7A4FF;
+  --modal-backdrop: rgba(8, 9, 20, 0.68);
+}
+
+/* Reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 1ms;
+    --dur-med: 1ms;
+    --dur-slow: 1ms;
+  }
+}
+
+:root[data-reduced-motion="true"] {
+  --dur-fast: 80ms;
+  --dur-med: 120ms;
+  --dur-slow: 150ms;
+}

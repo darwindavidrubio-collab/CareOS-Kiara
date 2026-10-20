@@ -1,0 +1,196 @@
+/* ==========================================================================
+   CareOS — Base, Reset, Tipografía & Layout Mobile-First
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  color-scheme: light dark;
+}
+
+body {
+  min-height: 100dvh;
+  font-family: var(--font-sans);
+  color: var(--text-main);
+  background-color: var(--bg-primary);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+  line-height: 1.55;
+  overflow-x: hidden;
+  transition:
+    background-color var(--dur-med) var(--ease-out),
+    color var(--dur-med) var(--ease-out);
+  position: relative;
+}
+
+/* Bloqueo total del scroll del fondo cuando una carta o modal está abierto */
+body.modal-open {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+/* Grano sutil de fondo (~3% opacidad) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Canvas de lluvia fijo detrás del contenido */
+#rain-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+:root[data-theme="lluvia"] #rain-canvas {
+  opacity: 1;
+}
+
+/* Contenedor de corazones flotantes */
+#hearts-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  overflow: hidden;
+}
+
+/* Tipografía fluida */
+h1, h2, h3, .serif-title {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: var(--text-main);
+}
+
+h1 {
+  font-size: clamp(1.55rem, 5vw, 1.95rem);
+}
+
+h2 {
+  font-size: clamp(1.22rem, 4vw, 1.42rem);
+}
+
+h3 {
+  font-size: clamp(1.05rem, 3.5vw, 1.18rem);
+}
+
+p {
+  font-size: clamp(0.95rem, 2.8vw, 1.02rem);
+  color: var(--text-main);
+}
+
+.text-muted {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: -0.01em;
+}
+
+/* Accesibilidad: foco visible */
+:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 3px;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+}
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Contenedor principal centrado Mobile-First (320px -> 540px max en desktop) */
+.app-shell {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding:
+    calc(var(--safe-top) + 1rem)
+    calc(var(--safe-right) + 1.1rem)
+    calc(var(--safe-bottom) + 3.5rem)
+    calc(var(--safe-left) + 1.1rem);
+}
+
+/* Fases de la experiencia */
+.phase-screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding:
+    calc(var(--safe-top) + 1.5rem)
+    1.25rem
+    calc(var(--safe-bottom) + 1.5rem);
+  position: relative;
+  z-index: 5;
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+}
+
+.phase-screen[hidden],
+.dashboard-view[hidden],
+[hidden] {
+  display: none !important;
+}
+
+.phase-fade-out {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.99);
+  pointer-events: none;
+}
+
+/* Lista vertical de módulos en el Dashboard */
+.modules-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1.1rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

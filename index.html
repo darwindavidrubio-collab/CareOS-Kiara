@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="rosado">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#FFF8F5" />
+  <meta name="description" content="CareOS — Tu sistema operativo personal de mimos, calma y compañía ♡" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>CareOS ♡</title>
+
+  <!-- PWA & Iconos -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon-192.svg" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg" />
+
+  <!-- Tipografías Google Fonts (Fraunces, Nunito, Fira Code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Nunito:wght@400;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Hojas de estilo modulares -->
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+  <!-- Canvas de lluvia en 2 capas (activo en modo lluvia) -->
+  <canvas id="rain-canvas" aria-hidden="true"></canvas>
+
+  <!-- Capa para corazones flotantes -->
+  <div id="hearts-layer" aria-hidden="true"></div>
+
+  <!-- ====================================================================
+       FASE 1: TERMINAL DE ARRANQUE
+       ==================================================================== -->
+  <section id="phase-boot" class="phase-screen" aria-label="Iniciando CareOS">
+    <div class="boot-card">
+      <div class="boot-header">
+        <div class="boot-dots" aria-hidden="true">
+          <span class="boot-dot"></span>
+          <span class="boot-dot"></span>
+          <span class="boot-dot"></span>
+        </div>
+        <span class="mono">careos-kernel ~ zsh</span>
+      </div>
+      <div id="boot-output" class="boot-output" aria-live="polite"></div>
+      <div class="boot-footer">
+        <button id="btn-skip-boot" type="button" class="btn-skip">
+          saltar &rarr;
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       FASE 1.5: CHEQUEO DE ÁNIMO
+       ==================================================================== -->
+  <section id="phase-mood" class="phase-screen" hidden aria-label="Chequeo de ánimo">
+    <div class="mood-card">
+      <span class="mood-badge mono">✨ protocolo de bienvenida</span>
+      <h1 id="mood-screen-title">¿Cómo estás hoy?</h1>
+      <p class="text-muted" style="margin-top: 0.35rem;">
+        Elige cómo te sientes para ajustar tus mimos de hoy:
+      </p>
+
+      <div id="mood-options-grid" class="mood-grid" role="group" aria-label="Opciones de estado de ánimo"></div>
+
+      <div id="mood-feedback-box" class="mood-feedback" hidden aria-live="polite">
+        <p id="mood-response-text"></p>
+        <div class="mood-actions">
+          <button id="btn-mood-theme-suggest" type="button" class="btn-secondary" hidden></button>
+          <button id="btn-mood-continue" type="button" class="btn-primary">
+            Entrar a mi rincón &hearts;
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       FASE 2: DASHBOARD PRINCIPAL
+       ==================================================================== -->
+  <div id="phase-dashboard" class="app-shell dashboard-view" hidden>
+    <header class="top-header">
+      <div class="greeting-box">
+        <div class="system-pill">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="system-version-label">CareOS v1.0 · activo</span>
+        </div>
+        <h1 id="dashboard-greeting-title">Hola, Mi Amor ♡</h1>
+        <p class="greeting-subtitle">Tu refugio suave para descansar hoy</p>
+      </div>
+
+      <div class="top-controls" role="toolbar" aria-label="Preferencias de ambiente">
+        <button
+          id="btn-rain-sound"
+          type="button"
+          class="icon-pill-btn"
+          aria-pressed="false"
+          aria-label="Activar o pausar sonido suave de lluvia"
+          title="Sonido suave de lluvia"
+        >
+          <span id="rain-sound-icon" aria-hidden="true">🔇</span>
+        </button>
+
+        <button
+          id="btn-motion-toggle"
+          type="button"
+          class="icon-pill-btn"
+          aria-pressed="false"
+          aria-label="Reducir animaciones"
+          title="Bajar animaciones"
+        >
+          <span aria-hidden="true">✨</span>
+        </button>
+
+        <button
+          id="btn-theme-toggle"
+          type="button"
+          class="icon-pill-btn theme-toggle-btn"
+          aria-pressed="false"
+          aria-label="Cambiar entre tema Rosado y tema Lluvia"
+        >
+          <span id="theme-toggle-icon" class="theme-icon" aria-hidden="true">🌸</span>
+          <span id="theme-toggle-label">Rosado</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Barra sutil con el estado de ánimo actual -->
+    <div class="active-mood-bar">
+      <span id="active-mood-text" class="text-muted">Estado de hoy: cuidándote mucho ♡</span>
+      <button id="btn-change-mood" type="button" class="btn-link-subtle">
+        Cambiar
+      </button>
+    </div>
+
+    <main class="modules-stack">
+      <!-- 1. MÓDULO: TERAPIA DE AUDIO -->
+      <section id="module-audio" class="care-card" aria-labelledby="title-audio">
+        <div class="recommended-tag">★ Recomendado para ti ahora</div>
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-kicker">// module_01 :: audio_therapy</span>
+            <h2 id="title-audio">🎧 Terapia de Audio</h2>
+          </div>
+        </div>
+
+        <p class="text-muted" style="margin-bottom: 0.75rem;">
+          Elige un ambiente suavecito o pega el enlace de lo que tengas ganas de escuchar hoy:
+        </p>
+
+        <div id="audio-chips-row" class="chips-row" role="group" aria-label="Playlists curadas"></div>
+
+        <div id="spotify-frame-wrap" class="spotify-frame-wrap">
+          <iframe
+            id="spotify-iframe"
+            title="Reproductor de Spotify"
+            loading="lazy"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          ></iframe>
+        </div>
+
+        <form id="custom-spotify-form" class="custom-spotify-form" novalidate>
+          <label for="custom-spotify-input" class="sr-only">Pega tu enlace de Spotify</label>
+          <input
+            id="custom-spotify-input"
+            type="url"
+            class="input-field"
+            placeholder="Pega tu enlace de Spotify (canción, playlist...)"
+            autocomplete="off"
+          />
+          <button type="submit" class="btn-secondary">Poner</button>
+        </form>
+        <p id="audio-feedback-msg" class="audio-feedback-msg" aria-live="polite"></p>
+
+        <div class="audio-footer-row">
+          <p class="audio-note">
+            💡 Si inicias sesión en Spotify en este navegador, las canciones suenan completas.
+          </p>
+          <a
+            id="btn-open-spotify"
+            href="https://open.spotify.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-secondary"
+          >
+            Abrir en Spotify &nearr;
+          </a>
+        </div>
+      </section>
+
+      <!-- 2. MÓDULO: SOBRECARGA DE AMOR -->
+      <section id="module-love" class="care-card" aria-labelledby="title-love">
+        <div class="recommended-tag">★ Recomendado para ti ahora</div>
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-kicker">// module_02 :: love_overload</span>
+            <h2 id="title-love">💌 Sobrecarga de Amor</h2>
+          </div>
+        </div>
+
+        <p class="text-muted" style="margin-bottom: 0.9rem;">
+          Para cuando necesites recordar cuánto te amo y lo importante que eres para mí:
+        </p>
+
+        <button id="btn-love-overload" type="button" class="btn-primary w-full">
+          💗 Ejecutar sobrecarga de amor
+        </button>
+
+        <p class="envelopes-section-title">Cartitas para cada momento («Ábrelas cuando…»):</p>
+        <div id="envelopes-grid" class="envelopes-grid"></div>
+      </section>
+
+      <!-- 3. MÓDULO: RESPIRA -->
+      <section id="module-breathe" class="care-card" aria-labelledby="title-breathe">
+        <div class="recommended-tag">★ Recomendado para ti ahora</div>
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-kicker">// module_03 :: breathe_sync</span>
+            <h2 id="title-breathe">🌬️ Respira Conmigo</h2>
+          </div>
+        </div>
+
+        <p class="text-muted">
+          Respirar profundo ayuda a relajar tu pancita y bajar la tensión del dolor:
+        </p>
+
+        <div class="breathe-stage">
+          <div id="breathe-orb-wrap" class="breathe-orb-wrap">
+            <div class="breathe-orb-halo" aria-hidden="true"></div>
+            <div class="breathe-orb" aria-live="polite">
+              <span id="breathe-phase-text" class="breathe-phase-text">Respira</span>
+              <span id="breathe-sec-text" class="breathe-sec-text">4s / 6s</span>
+            </div>
+          </div>
+
+          <p id="breathe-meta-text" class="breathe-meta">
+            Inhala en 4 segundos, exhala lento en 6 segundos.
+          </p>
+
+          <button
+            id="btn-breathe-toggle"
+            type="button"
+            class="btn-secondary"
+            aria-pressed="false"
+          >
+            Iniciar respiración guiada
+          </button>
+        </div>
+      </section>
+
+      <!-- 4. MÓDULO: COMPRESA CALIENTE -->
+      <section id="module-heat" class="care-card" aria-labelledby="title-heat">
+        <div class="recommended-tag">★ Recomendado para ti ahora</div>
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-kicker">// module_04 :: thermal_care</span>
+            <h2 id="title-heat">🔥 Compresa Calientita</h2>
+          </div>
+        </div>
+
+        <div class="heat-presets" role="group" aria-label="Duración de la compresa">
+          <button type="button" class="chip-btn" data-heat-min="10" aria-pressed="false">10 min</button>
+          <button type="button" class="chip-btn" data-heat-min="15" aria-pressed="true">15 min</button>
+          <button type="button" class="chip-btn" data-heat-min="20" aria-pressed="false">20 min</button>
+        </div>
+
+        <div id="heat-ring-container" class="heat-ring-container">
+          <svg class="heat-svg" viewBox="0 0 168 168" aria-hidden="true">
+            <circle class="heat-track" cx="84" cy="84" r="74"></circle>
+            <circle id="heat-progress-ring" class="heat-progress" cx="84" cy="84" r="74"></circle>
+          </svg>
+          <div class="heat-center">
+            <span class="heat-icon" aria-hidden="true">🌸</span>
+            <span id="heat-time-display" class="heat-time" aria-live="off">15:00</span>
+          </div>
+        </div>
+
+        <p id="heat-status-msg" class="heat-status-msg" aria-live="polite">
+          Acomoda la compresa tibia sobre tu pancita ♡
+        </p>
+
+        <div class="heat-controls">
+          <button id="btn-heat-toggle" type="button" class="btn-primary">Iniciar</button>
+          <button id="btn-heat-reset" type="button" class="btn-secondary">Reiniciar</button>
+        </div>
+      </section>
+
+      <!-- 5. MÓDULO: CHECKLIST DE MIMOS -->
+      <section id="module-checklist" class="care-card" aria-labelledby="title-checklist">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-kicker">// module_05 :: daily_care</span>
+            <h2 id="title-checklist">🍵 Checklist de Mimos</h2>
+          </div>
+          <span id="checklist-progress-label" class="coupons-counter-pill">0/5</span>
+        </div>
+
+        <p class="text-muted" style="margin-bottom: 0.85rem;">
+          Pequeños cuidados para que tu cuerpo se sienta más abrigado hoy:
+        </p>
+
+        <div id="checklist-items" class="checklist-items"></div>
+
+        <div id="checklist-complete-banner" class="checklist-complete-banner" hidden aria-live="polite">
+          Sistema estable ✨ Estoy muy orgulloso de cómo te cuidas, mi amor.
+        </div>
+      </section>
+
+      <!-- 6. MÓDULO: CUPONES CANJEABLES -->
+      <section id="module-coupons" class="care-card" aria-labelledby="title-coupons">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-kicker">// module_06 :: love_tickets</span>
+            <h2 id="title-coupons">🎟️ Cupones de Cariño</h2>
+          </div>
+          <span id="coupons-counter" class="coupons-counter-pill">Te quedan 8 cupones</span>
+        </div>
+
+        <p class="text-muted" style="margin-bottom: 0.9rem;">
+          Toca cualquier ticket para ver el detalle y canjearlo directo en mi WhatsApp:
+        </p>
+
+        <div id="coupons-list" class="coupons-list"></div>
+
+        <div class="coupons-footer">
+          <button id="btn-reset-coupons" type="button" class="btn-secondary" hidden>
+            ✨ Recargar mis cupones de nuevo
+          </button>
+        </div>
+      </section>
+
+      <!-- 7. MÓDULO: CANAL DE EMERGENCIA (SOPORTE TÉCNICO) -->
+      <section id="module-sos" class="care-card sos-card" aria-labelledby="title-sos">
+        <span class="card-kicker">// module_07 :: priority_support</span>
+        <h2 id="title-sos" style="margin-top: 0.25rem;">🚨 Soporte Técnico Directo</h2>
+        <p class="text-muted" style="margin-top: 0.35rem;">
+          ¿Necesitas atención inmediata, mimos extra o que te escuche ya mismo?
+        </p>
+        <button id="btn-emergency-sos" type="button" class="btn-primary btn-sos">
+          🥺 Llamar a mi novio ahora mismo
+        </button>
+      </section>
+
+      <!-- 8. EASTER EGG: GIT LOG -->
+      <section id="module-gitlog" class="gitlog-card" aria-label="Historial de nuestra historia">
+        <div class="gitlog-header">
+          <span>$ git log --oneline --graph --love</span>
+          <span>HEAD -> main</span>
+        </div>
+        <ul id="gitlog-list" class="gitlog-list"></ul>
+      </section>
+    </main>
+  </div>
+
+  <!-- ====================================================================
+       MODAL DE CARTAS DE AMOR
+       ==================================================================== -->
+  <div
+    id="letter-modal-backdrop"
+    class="modal-backdrop"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="letter-modal-title"
+  >
+    <div class="letter-modal">
+      <div class="letter-modal-header">
+        <h2 id="letter-modal-title">Para ti ♡</h2>
+        <button
+          id="btn-close-letter"
+          type="button"
+          class="btn-close-modal"
+          aria-label="Cerrar carta"
+        >
+          &times;
+        </button>
+      </div>
+      <div id="letter-modal-body" class="letter-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       BOTTOM SHEET DE CONFIRMACIÓN DE CUPONES
+       ==================================================================== -->
+  <div
+    id="sheet-modal-backdrop"
+    class="modal-backdrop bottom-sheet-backdrop"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="sheet-modal-title"
+  >
+    <div class="bottom-sheet">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <h3 id="sheet-modal-title">¿Canjear este cupón?</h3>
+      <p id="sheet-modal-desc" class="text-muted" style="margin-top: 0.45rem;"></p>
+      <div class="sheet-actions">
+        <button id="btn-sheet-cancel" type="button" class="btn-secondary">
+          Cancelar
+        </button>
+        <button id="btn-sheet-confirm" type="button" class="btn-primary">
+          Sí, canjear ♡
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Punto de entrada ES Modules -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
